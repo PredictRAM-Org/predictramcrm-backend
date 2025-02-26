@@ -1,0 +1,16 @@
+module.exports.OrganizationController = require("./organization.controller");
+module.exports.ProfileController = require("./profile.controller");
+module.exports.AuthController = require("./auth.controller");
+module.exports.UserController = require("./user.controller");
+module.exports.MarketCallController = require("./marketcall.controller");
+module.exports.ProfileMarketCallController = require("./profileMarketcall.controller");
+module.exports.MarketCallPortfolioController = require("./marketcallPortfolio.controller");
+module.exports.ResponseController = require("./response.controller");
+module.exports.MarketDataController = require("./marketdata.controller");
+module.exports.TaskController = require("./task.controller");
+module.exports.CallController = require("./call.controller");
+module.exports.PredictRamController = require("./predictram.controller");
+module.exports.StockController = require("./stock.controller");
+module.exports.MarketCallHistoryController = require("./marketcallHistory.controller");
+module.exports.NotificationController = require("./notification.controller");
+module.exports.KycController = require("./kyc.controller");

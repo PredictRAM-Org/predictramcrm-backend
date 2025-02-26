@@ -1,0 +1,14 @@
+module.exports.AuthService = require("./auth.service");
+module.exports.UserService = require("./user.service");
+module.exports.ProfileService = require("./profile.service");
+module.exports.OrganizationService = require("./organization.service");
+module.exports.MarketCallService = require("./marketcall.service");
+module.exports.ProfileMarketCallService = require("./profileMarketcall.service");
+module.exports.ResponseService = require("./response.service");
+module.exports.FyersService = require("./fyers.service");
+module.exports.OTPService = require("./otp.service");
+module.exports.TaskService = require("./task.service");
+module.exports.PredictRamService = require("./predictram.service");
+module.exports.MarketCallHistoryService = require("./marketcallHistory.service");
+module.exports.StockService = require("./stock.service");
+module.exports.NotificationService = require("./notification.service");

@@ -1,0 +1,44 @@
+{
+  "name": "predictramcrm-backend",
+  "version": "1.0.0",
+  "description": "A CRM project for investing farms",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://predictramtest@dev.azure.com/predictramtest/predictram/_git/predictramcrm-backend"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@azure/service-bus": "^7.9.4",
+    "archetype": "github:LaurentGoderre/archetype#fix-lodash_set-vuln",
+    "axios": "^1.6.7",
+    "bcrypt": "^5.1.1",
+    "connect-mongodb-session": "^5.0.0",
+    "cors": "^2.8.5",
+    "date-fns": "^3.5.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.18.2",
+    "express-session": "^1.18.0",
+    "fyers-api-v3": "^1.0.3",
+    "http-status": "^1.7.4",
+    "joi": "^17.12.2",
+    "jsonwebtoken": "^9.0.2",
+    "lodash": "^4.17.21",
+    "moment": "^2.30.1",
+    "mongoose": "^8.2.0",
+    "nodemailer": "^6.9.10",
+    "nodemon": "^3.1.4",
+    "otp-generator": "^4.0.1",
+    "passport": "^0.7.0",
+    "passport-local": "^1.0.0",
+    "redis": "^4.7.0",
+    "socket.io": "^4.7.4",
+    "twilio": "^5.0.4"
+  }
+}

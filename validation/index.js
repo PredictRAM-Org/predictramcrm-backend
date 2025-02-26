@@ -1,0 +1,10 @@
+module.exports.AuthValidate = require("./auth.validation");
+module.exports.UserValidate = require("./user.validation");
+module.exports.OrganizationValidate = require("./organization.validation");
+module.exports.MarketCallValidate = require("./marketcall.validation");
+module.exports.NotificationValidate = require("./notification.validation");
+module.exports.MarketCallHistoryValidate = require("./marketcallHistory.validation");
+module.exports.ResponseValidate = require("./response.validation");
+module.exports.MarketDataValidate = require("./marketdata.validation");
+module.exports.TaskValidate = require("./task.validation");
+module.exports.StockValidate = require("./stock.validation");

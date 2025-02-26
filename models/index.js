@@ -1,0 +1,10 @@
+module.exports.User = require("./user.model");
+module.exports.Organization = require("./organization.model");
+module.exports.MarketCall = require("./marketcall.model");
+module.exports.MarketCallPortfolio = require("./marketcallPortfolio.model");
+module.exports.Response = require("./response.model");
+module.exports.OTP = require("./otp.model");
+module.exports.Task = require("./task.model");
+module.exports.MarketCallHistory = require("./marketcallHistory.model");
+module.exports.Stock = require("./stock.model");
+module.exports.Notification = require("./notification.model");
