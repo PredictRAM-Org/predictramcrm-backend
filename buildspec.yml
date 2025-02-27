@@ -1,0 +1,24 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - echo Installing dependencies...
+      - npm install
+  pre_build:
+    commands:
+      - echo Running pre-build checks...
+      - npm audit --production || true
+  build:
+    commands:
+      - echo Build step - Nothing to build for Node.js backend
+  post_build:
+    commands:
+      - echo Preparing deployment package...
+      - zip -r deploy-package.zip * .[^.]* -x "*.git*" "node_modules/*" "*.log"
+artifacts:
+  files:
+    - deploy-package.zip
+cache:
+  paths:
+    - node_modules/**/*
