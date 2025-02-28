@@ -15,10 +15,16 @@ phases:
   post_build:
     commands:
       - echo Preparing deployment package...
-      - zip -r deploy-package.zip * .[^.]* -x "*.git*" "node_modules/*" "*.log"
+      - rm -rf node_modules
+
 artifacts:
   files:
-    - deploy-package.zip
+    - '**/*'
+  exclude_patterns:
+    - 'node_modules/**'
+    - '.git/**'
+    - '*.log'
+
 cache:
   paths:
     - node_modules/**/*
