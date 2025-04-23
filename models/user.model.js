@@ -94,8 +94,9 @@ const userSchema = new Schema(
     kyc: {
       esign: { type: Boolean, default: false },
       ekyc: { type: Boolean, default: false },
-      ekycDocid: { type: String },
-      esignDocid: { type: String },
+      webhook_security_key: { type: String },
+      ekycInfo: { type: Object },
+      esignInfo: { type: Object },
     },
     role: {
       type: String,

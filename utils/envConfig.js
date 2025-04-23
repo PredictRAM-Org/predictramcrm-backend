@@ -43,8 +43,11 @@ module.exports = {
     secret: process.env.TWILIO_AUTH_TOKEN,
   },
   kyc: {
-    apiToken: process.env.DIGIO_AUTH_TOKEN,
+    apiKey: process.env.ZOOK_API_KEY,
+    appID: process.env.ZOOK_APP_ID,
     pdf: process.env.KYC_PDF,
-    base_url: process.env.DIGIO_BASE_URL,
+    base_url: process.env.ZOOK_BASE_URL,
+    response_url: process.env.ZOOK_RESPONSE_URL,
+    redirect_url: process.env.ZOOK_REDIRECT_URL,
   },
 };
