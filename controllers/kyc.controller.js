@@ -140,4 +140,18 @@ module.exports = class CallController {
       next(err);
     }
   }
+
+  static async kycWebhook(req, res, next) {
+    try {
+      const body = req.body;
+
+      res.send({
+        status: "success",
+        message: "Webhook received successfully",
+        data: body,
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
 };
