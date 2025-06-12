@@ -46,5 +46,6 @@ module.exports = {
     apiToken: process.env.DIGIO_AUTH_TOKEN,
     pdf: process.env.KYC_PDF,
     base_url: process.env.DIGIO_BASE_URL,
+    webhook_secret: process.env.WEBHOOK_SECRET,
   },
 };

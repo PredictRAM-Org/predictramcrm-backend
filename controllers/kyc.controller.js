@@ -1,3 +1,5 @@
+const crypto = require("crypto");
+const { User } = require("../models");
 const axios = require("axios");
 const ApiError = require("../utils/ApiError");
 const httpStatus = require("http-status");
@@ -143,12 +145,46 @@ module.exports = class CallController {
 
   static async kycWebhook(req, res, next) {
     try {
-      const body = req.body;
+      // Step 1: Verify HMAC signature
+      const signature = req.headers["x-signature"];
+      const phone = req.body.phone_no;
+      const expectedSignature = crypto
+        .createHmac("sha256", envConfig.kyc.webhook_secret)
+        .update(phone)
+        .digest("hex");
+      console.log(expectedSignature, signature);
 
-      res.send({
+      if (signature !== expectedSignature) {
+        return res
+          .status(403)
+          .json({ status: "error", message: "Invalid signature" });
+      }
+
+      // Step 2: Extract data from webhook body
+      const body = req.body;
+      const { phone_no, e_mail, ...kycDetails } = body;
+
+      // Step 3: Find user by phone or email
+      const user = await User.findOne({
+        $or: [{ phone: phone_no }, { email: e_mail }],
+      });
+
+      if (!user) {
+        return res
+          .status(404)
+          .json({ status: "error", message: "User not found" });
+      }
+
+      // Step 4: Update KYC data
+      user.kycDetails = kycDetails;
+      user.kycCompleted = true;
+      await user.save();
+
+      // Step 5: Respond success
+      res.json({
         status: "success",
-        message: "Webhook received successfully",
-        data: body,
+        message: "KYC data updated successfully",
+        data: { userId: user.id },
       });
     } catch (err) {
       next(err);

@@ -91,11 +91,12 @@ const userSchema = new Schema(
     address: {
       type: addressSchema,
     },
-    kyc: {
-      esign: { type: Boolean, default: false },
-      ekyc: { type: Boolean, default: false },
-      ekycDocid: { type: String },
-      esignDocid: { type: String },
+    kycCompleted: {
+      type: Boolean,
+      default: false,
+    },
+    kycDetails: {
+      type: Object,
     },
     role: {
       type: String,
