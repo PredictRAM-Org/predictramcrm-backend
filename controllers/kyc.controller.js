@@ -166,7 +166,7 @@ module.exports = class CallController {
 
       // Step 3: Find user by phone or email
       const user = await User.findOne({
-        $or: [{ phone: phone_no }, { email: e_mail }],
+        $or: [{ phone: `+91${phone_no}` }, { email: e_mail }],
       });
 
       if (!user) {
