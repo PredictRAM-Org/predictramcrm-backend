@@ -162,7 +162,7 @@ module.exports = class CallController {
         { userId: user._id },
         envConfig.kyc.webhook_secret,
         {
-          expiresIn: "1m",
+          expiresIn: "30m",
         }
       );
 
