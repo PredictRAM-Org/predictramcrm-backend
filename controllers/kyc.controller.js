@@ -1,5 +1,6 @@
 const crypto = require("crypto");
 const { User } = require("../models");
+const jwt = require("jsonwebtoken");
 const axios = require("axios");
 const ApiError = require("../utils/ApiError");
 const httpStatus = require("http-status");
@@ -143,30 +144,12 @@ module.exports = class CallController {
     }
   }
 
-  static async kycWebhook(req, res, next) {
+  static async kycAuth(req, res, next) {
     try {
-      // Step 1: Verify HMAC signature
-      const signature = req.headers["x-signature"];
-      const phone = req.body.phone_no;
-      const expectedSignature = crypto
-        .createHmac("sha256", envConfig.kyc.webhook_secret)
-        .update(phone)
-        .digest("hex");
-      console.log(expectedSignature, signature);
+      const { phone_no } = req.body;
 
-      if (signature !== expectedSignature) {
-        return res
-          .status(403)
-          .json({ status: "error", message: "Invalid signature" });
-      }
-
-      // Step 2: Extract data from webhook body
-      const body = req.body;
-      const { phone_no, e_mail, ...kycDetails } = body;
-
-      // Step 3: Find user by phone or email
       const user = await User.findOne({
-        $or: [{ phone: `+91${phone_no}` }, { email: e_mail }],
+        phone: `+91${phone_no}`,
       });
 
       if (!user) {
@@ -175,18 +158,64 @@ module.exports = class CallController {
           .json({ status: "error", message: "User not found" });
       }
 
-      // Step 4: Update KYC data
+      const token = jwt.sign(
+        { userId: user._id },
+        envConfig.kyc.webhook_secret,
+        {
+          expiresIn: "1m",
+        }
+      );
+
+      res.json({
+        status: "success",
+        message: "Authorization token generated",
+        token,
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async kycWebhook(req, res, next) {
+    try {
+      const authHeader = req.headers["authorization"];
+      const token = authHeader?.split(" ")[1];
+
+      if (!token) {
+        return res
+          .status(401)
+          .json({ status: "error", message: "Missing token" });
+      }
+
+      const decoded = jwt.verify(token, envConfig.kyc.webhook_secret);
+      const userId = decoded.userId;
+
+      const user = await User.findById(userId);
+
+      if (!user) {
+        return res
+          .status(404)
+          .json({ status: "error", message: "User not found" });
+      }
+
+      const body = req.body;
+      const { phone_no, e_mail, ...kycDetails } = body;
+
       user.kycDetails = kycDetails;
       user.kycCompleted = true;
       await user.save();
 
-      // Step 5: Respond success
       res.json({
         status: "success",
         message: "KYC data updated successfully",
         data: { userId: user.id },
       });
     } catch (err) {
+      if (err.name === "TokenExpiredError") {
+        return res
+          .status(401)
+          .json({ status: "error", message: "Token expired" });
+      }
       next(err);
     }
   }
