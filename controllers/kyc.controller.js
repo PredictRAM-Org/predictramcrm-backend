@@ -78,7 +78,7 @@ module.exports = class CallController {
       const { document_id } = req.query;
       const api_res = await axios.get(
         envConfig.kyc.base_url +
-          `/v2/client/document/download?document_id=${document_id}`,
+        `/v2/client/document/download?document_id=${document_id}`,
         {
           headers: {
             Authorization: `Basic ${envConfig.kyc.apiToken}`,
@@ -144,79 +144,126 @@ module.exports = class CallController {
     }
   }
 
-  static async kycAuth(req, res, next) {
-    try {
-      const { phone_no } = req.body;
-
-      const user = await User.findOne({
-        phone: `+91${phone_no}`,
-      });
-
-      if (!user) {
-        return res
-          .status(404)
-          .json({ status: "error", message: "User not found" });
-      }
-
-      const token = jwt.sign(
-        { userId: user._id },
-        envConfig.kyc.webhook_secret,
-        {
-          expiresIn: "30m",
-        }
-      );
-
-      res.json({
-        status: "success",
-        message: "Authorization token generated",
-        token,
-      });
-    } catch (err) {
-      next(err);
-    }
-  }
-
   static async kycWebhook(req, res, next) {
     try {
+      // 1. Check static Authorization key
       const authHeader = req.headers["authorization"];
-      const token = authHeader?.split(" ")[1];
+      const STATIC_KEY = envConfig.kyc.webhook_secret;
 
-      if (!token) {
-        return res
-          .status(401)
-          .json({ status: "error", message: "Missing token" });
+      if (!authHeader || authHeader !== `Basic ${STATIC_KEY}`) {
+        return res.status(401).json({
+          status: "error",
+          message: "Unauthorized access"
+        });
       }
 
-      const decoded = jwt.verify(token, envConfig.kyc.webhook_secret);
-      const userId = decoded.userId;
+      // 2. Extract phone number from payload
+      const { phone_no, ...kycDetails } = req.body;
+      if (!phone_no) {
+        return res.status(400).json({
+          status: "error",
+          message: "Missing phone number"
+        });
+      }
 
-      const user = await User.findById(userId);
+      // 3. Find user by phone number
+      const user = await User.findOne({ phone: `+91${phone_no}` });
 
       if (!user) {
-        return res
-          .status(404)
-          .json({ status: "error", message: "User not found" });
+        return res.status(404).json({
+          status: "error",
+          message: "User not found"
+        });
       }
 
-      const body = req.body;
-      const { phone_no, e_mail, ...kycDetails } = body;
-
+      // 4. Save KYC data
       user.kycDetails = kycDetails;
       user.kycCompleted = true;
       await user.save();
 
-      res.json({
+      return res.json({
         status: "success",
         message: "KYC data updated successfully",
-        data: { userId: user.id },
+        data: { userId: user._id }
       });
     } catch (err) {
-      if (err.name === "TokenExpiredError") {
-        return res
-          .status(401)
-          .json({ status: "error", message: "Token expired" });
-      }
       next(err);
     }
   }
+
+  // static async kycAuth(req, res, next) {
+  //   try {
+  //     const { phone_no } = req.body;
+
+  //     const user = await User.findOne({
+  //       phone: `+91${phone_no}`,
+  //     });
+
+  //     if (!user) {
+  //       return res
+  //         .status(404)
+  //         .json({ status: "error", message: "User not found" });
+  //     }
+
+  //     const token = jwt.sign(
+  //       { userId: user._id },
+  //       envConfig.kyc.webhook_secret,
+  //       {
+  //         expiresIn: "30m",
+  //       }
+  //     );
+
+  //     res.json({
+  //       status: "success",
+  //       message: "Authorization token generated",
+  //       token,
+  //     });
+  //   } catch (err) {
+  //     next(err);
+  //   }
+  // }
+
+  // static async kycWebhook(req, res, next) {
+  //   try {
+  //     const authHeader = req.headers["authorization"];
+  //     const token = authHeader?.split(" ")[1];
+
+  //     if (!token) {
+  //       return res
+  //         .status(401)
+  //         .json({ status: "error", message: "Missing token" });
+  //     }
+
+  //     const decoded = jwt.verify(token, envConfig.kyc.webhook_secret);
+  //     const userId = decoded.userId;
+
+  //     const user = await User.findById(userId);
+
+  //     if (!user) {
+  //       return res
+  //         .status(404)
+  //         .json({ status: "error", message: "User not found" });
+  //     }
+
+  //     const body = req.body;
+  //     const { phone_no, e_mail, ...kycDetails } = body;
+
+  //     user.kycDetails = kycDetails;
+  //     user.kycCompleted = true;
+  //     await user.save();
+
+  //     res.json({
+  //       status: "success",
+  //       message: "KYC data updated successfully",
+  //       data: { userId: user.id },
+  //     });
+  //   } catch (err) {
+  //     if (err.name === "TokenExpiredError") {
+  //       return res
+  //         .status(401)
+  //         .json({ status: "error", message: "Token expired" });
+  //     }
+  //     next(err);
+  //   }
+  // }
 };
