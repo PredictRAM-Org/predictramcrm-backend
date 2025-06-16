@@ -33,10 +33,11 @@ app.use(sessionMiddleware);
 
 app.use(
   cors({
-    origin: [
-      "http://localhost:8080",
-      "https://predictram-crm-backend.azurewebsites.net",
-    ],
+    // origin: [
+    //   "http://localhost:8080",
+    //   "https://predictram-crm-backend.azurewebsites.net",
+    // ],    
+    origin: "*",
     credentials: true,
     allowedHeaders: "*",
   })
