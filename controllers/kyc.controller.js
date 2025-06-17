@@ -6,6 +6,7 @@ const ApiError = require("../utils/ApiError");
 const httpStatus = require("http-status");
 const envConfig = require("../utils/envConfig");
 const response = require("../utils/formatResponse");
+const { PredictRamService } = require("../services");
 
 module.exports = class CallController {
   static async handelKYCResponse(req, res, next) {
@@ -78,7 +79,7 @@ module.exports = class CallController {
       const { document_id } = req.query;
       const api_res = await axios.get(
         envConfig.kyc.base_url +
-        `/v2/client/document/download?document_id=${document_id}`,
+          `/v2/client/document/download?document_id=${document_id}`,
         {
           headers: {
             Authorization: `Basic ${envConfig.kyc.apiToken}`,
@@ -153,7 +154,7 @@ module.exports = class CallController {
       if (!authHeader || authHeader !== `Basic ${STATIC_KEY}`) {
         return res.status(401).json({
           status: "error",
-          message: "Unauthorized access"
+          message: "Unauthorized access",
         });
       }
 
@@ -162,29 +163,40 @@ module.exports = class CallController {
       if (!phone_no) {
         return res.status(400).json({
           status: "error",
-          message: "Missing phone number"
+          message: "Missing phone number",
         });
       }
 
       // 3. Find user by phone number
-      const user = await User.findOne({ phone: `+91${phone_no}` });
+      const crmUser = await User.findOne({ phone: `+91${phone_no}` });
+      const investorUser = await PredictRamService.getOneInvestorUser({
+        mobileNumber: `+91${phone_no}`,
+      });
 
-      if (!user) {
+      if (!crmUser && !investorUser) {
         return res.status(404).json({
           status: "error",
-          message: "User not found"
+          message: "User not found",
         });
       }
 
       // 4. Save KYC data
-      user.kycDetails = kycDetails;
-      user.kycCompleted = true;
-      await user.save();
+      if (crmUser) {
+        crmUser.kycDetails = kycDetails;
+        crmUser.kycCompleted = true;
+        await crmUser.save();
+      }
+
+      if (investorUser) {
+        await PredictRamService.updateOneInvestorUser(
+          { mobileNumber: `+91${phone_no}` },
+          { kycDetails, kycCompleted: true }
+        );
+      }
 
       return res.json({
         status: "success",
         message: "KYC data updated successfully",
-        data: { userId: user._id }
       });
     } catch (err) {
       next(err);

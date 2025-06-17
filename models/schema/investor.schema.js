@@ -30,6 +30,13 @@ const investorSchema = new Mongoose.Schema(
       paymentId: String,
       paymentDate: { type: Date },
     },
+    kycCompleted: {
+      type: Boolean,
+      default: false,
+    },
+    kycDetails: {
+      type: Object,
+    },
   },
   {
     timestamps: true,

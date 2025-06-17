@@ -13,6 +13,14 @@ module.exports = class PredictRamService {
 
     return user;
   }
+  static async updateOneInvestorUser(filter, updateData) {
+    const user = await investorModel.findOneAndUpdate(
+      { ...filter },
+      updateData,
+      { new: true }
+    );
+    return user;
+  }
   static async getRiskScore(filter) {
     const riskScore = await riskScoreModel.findOne({ ...filter });
     return riskScore;
